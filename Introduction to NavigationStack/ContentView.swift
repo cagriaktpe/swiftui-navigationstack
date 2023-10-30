@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var path = NavigationPath()
+    
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             
             List {
                 Section("Foods") {
@@ -27,6 +29,14 @@ struct ContentView: View {
                         }
                     }
                 }
+                
+                Section("Desserts") {
+                    ForEach(desserts) { dessert in
+                        NavigationLink(value: dessert) {
+                            MenuItemView(item: dessert)
+                        }
+                    }
+                }
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Menu")
@@ -35,6 +45,19 @@ struct ContentView: View {
             }
             .navigationDestination(for: Drink.self) { item in
                 DrinkDetailView(drink: item)
+            }
+            .navigationDestination(for: Dessert.self) { item in
+                DessertDetailView(dessert: item)
+            }
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Suprise Me") {
+                        let items: [any Hashable] = foods + drinks + desserts
+                        if let randomItem = items.randomElement() {
+                            path.append(randomItem)
+                        }
+                    }
+                }
             }
             
         }
